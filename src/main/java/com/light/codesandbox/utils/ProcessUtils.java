@@ -41,7 +41,7 @@ public class ProcessUtils {
                 while ((compileOutputLine = bufferedReader.readLine()) != null) {
                     compileOutputStringBuilder.append(compileOutputLine);
                 }
-                executeMessage.setMessage(compileOutputStringBuilder.append("\n").toString());
+                executeMessage.setMessage(compileOutputStringBuilder.toString());
             } else {
                 System.out.println(operationName + "失败，错误码：" + exitValue);
                 BufferedReader errorBufferedReader = new BufferedReader(new InputStreamReader(runningProcess.getErrorStream()));
