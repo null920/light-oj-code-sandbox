@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
  * @author null&&
  * @Date 2024/6/24 19:46
  */
-public class RunFileError {
+public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
         String userDir = System.getProperty("user.dir");
         // 通过相对路径，直接读取到项目的配置文件

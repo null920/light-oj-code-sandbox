@@ -4,10 +4,13 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.dfa.FoundWord;
+import cn.hutool.dfa.WordTree;
 import com.light.codesandbox.model.ExecuteCodeRequest;
 import com.light.codesandbox.model.ExecuteCodeResponse;
 import com.light.codesandbox.model.ExecuteMessage;
 import com.light.codesandbox.model.JudgeInfo;
+import com.light.codesandbox.security.DefaultSecurityManager;
 import com.light.codesandbox.utils.ProcessUtils;
 
 import java.io.File;
@@ -29,12 +32,23 @@ public class JavaNativeCodeSandbox implements CodeSandbox {
 
     private static final long TIME_OUT = 5000L;
 
+    private static final List<String> blackList = Arrays.asList("Runtime", "File", "Files", "exec", "Process", "ClassLoader", "System", "System.exit");
+
+    private static final WordTree WORD_TREE;
+
+    static {
+        // 初始化字典树
+        WORD_TREE = new WordTree();
+        WORD_TREE.addWords(blackList);
+    }
+
     public static void main(String[] args) {
         JavaNativeCodeSandbox javaNativeCodeSandbox = new JavaNativeCodeSandbox();
         ExecuteCodeRequest executeCodeRequest = new ExecuteCodeRequest();
         //String code = ResourceUtil.readStr("testCode/simpleComputeArgs/Main.java", StandardCharsets.UTF_8);
-        String code = ResourceUtil.readStr("testCode/unsafeCode/SleepError.java", StandardCharsets.UTF_8);
+        //String code = ResourceUtil.readStr("testCode/unsafeCode/SleepError.java", StandardCharsets.UTF_8);
         //String code = ResourceUtil.readStr("testCode/unsafeCode/ReadFileError.java", StandardCharsets.UTF_8);
+        String code = ResourceUtil.readStr("testCode/unsafeCode/RunFileError.java", StandardCharsets.UTF_8);
         executeCodeRequest.setInputList(Arrays.asList("1 2", "1 3"));
         executeCodeRequest.setLanguage("java");
         executeCodeRequest.setCode(code);
@@ -44,9 +58,18 @@ public class JavaNativeCodeSandbox implements CodeSandbox {
 
     @Override
     public ExecuteCodeResponse executeCode(ExecuteCodeRequest executeRequest) {
+        System.setSecurityManager(new DefaultSecurityManager());
+
         List<String> inputList = executeRequest.getInputList();
         String language = executeRequest.getLanguage();
         String code = executeRequest.getCode();
+
+        // 检查代码是否包含黑名单关键字
+        FoundWord foundWord = WORD_TREE.matchWord(code);
+        if (foundWord != null) {
+            System.out.println("代码中有非法字符：" + foundWord.getFoundWord());
+            return null;
+        }
 
         String userDir = System.getProperty("user.dir");
         String globalCodePathName = userDir + File.separator + GLOBAL_CODE_DIR_NAME;
@@ -76,6 +99,7 @@ public class JavaNativeCodeSandbox implements CodeSandbox {
             String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Main %s", userCodeParentPath, inputArgs);
             try {
                 Process runProcess = Runtime.getRuntime().exec(runCmd);
+                // 防止进程一直卡主占用资源
                 new Thread(() -> {
                     try {
                         Thread.sleep(TIME_OUT);
