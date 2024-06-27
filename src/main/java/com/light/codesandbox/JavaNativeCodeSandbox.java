@@ -99,7 +99,7 @@ public class JavaNativeCodeSandbox implements CodeSandbox {
             String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Main %s", userCodeParentPath, inputArgs);
             try {
                 Process runProcess = Runtime.getRuntime().exec(runCmd);
-                // 防止进程一直卡主占用资源
+                // 防止进程一直卡住，占用资源
                 new Thread(() -> {
                     try {
                         Thread.sleep(TIME_OUT);
