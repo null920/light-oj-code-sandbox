@@ -56,6 +56,12 @@ public class JavaNativeCodeSandbox implements CodeSandbox {
         System.out.println(executeCodeResponse);
     }
 
+    /**
+     * 执行代码
+     *
+     * @param executeRequest 执行代码请求参数
+     * @return 执行代码响应
+     */
     @Override
     public ExecuteCodeResponse executeCode(ExecuteCodeRequest executeRequest) {
         System.setSecurityManager(new DefaultSecurityManager());
