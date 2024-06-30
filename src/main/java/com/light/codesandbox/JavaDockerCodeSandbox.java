@@ -17,6 +17,7 @@ import com.light.codesandbox.model.ExecuteMessage;
 import com.light.codesandbox.model.JudgeInfo;
 import com.light.codesandbox.security.DefaultSecurityManager;
 import com.light.codesandbox.utils.ProcessUtils;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
 import java.io.Closeable;
@@ -85,10 +86,8 @@ public class JavaDockerCodeSandbox implements CodeSandbox {
             return getErrorResponse(e);
         }
 
-        // 创建容器，把用户代码复制到容器
         DockerClient dockerClient = DockerClientBuilder.getInstance().build();
         String imageName = "openjdk:8-alpine";
-
         List<Image> imageList = dockerClient.listImagesCmd().exec();
         boolean imageExist = imageList.stream()
                 .flatMap(image -> Arrays.stream(image.getRepoTags()))
@@ -116,7 +115,7 @@ public class JavaDockerCodeSandbox implements CodeSandbox {
             }
             System.out.println("下载完成");
         }
-        // 创建容器
+        // 创建容器，把用户代码复制到容器
         String containerId = null;
         HostConfig hostConfig = new HostConfig();
         hostConfig.withMemory(100 * 1024 * 1024L);
@@ -142,7 +141,6 @@ public class JavaDockerCodeSandbox implements CodeSandbox {
             dockerClient.startContainerCmd(containerId).exec();
             System.out.println("容器启动成功，容器ID：" + containerId);
         }
-
 
         // docker exec [containerId] java -cp /app Main 1 3
         // 创建执行命令

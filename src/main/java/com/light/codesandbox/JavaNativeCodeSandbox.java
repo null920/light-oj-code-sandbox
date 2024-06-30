@@ -12,6 +12,7 @@ import com.light.codesandbox.model.ExecuteMessage;
 import com.light.codesandbox.model.JudgeInfo;
 import com.light.codesandbox.security.DefaultSecurityManager;
 import com.light.codesandbox.utils.ProcessUtils;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;

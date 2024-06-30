@@ -10,12 +10,12 @@ import com.light.codesandbox.model.ExecuteCodeResponse;
  * @Date 2024/6/21 19:00
  */
 public interface CodeSandbox {
+
     /**
      * 执行代码
      *
-     * @param executeRequest
-     * @return
+     * @param executeRequest 请求体
+     * @return 执行代码响应
      */
-
     ExecuteCodeResponse executeCode(ExecuteCodeRequest executeRequest);
 }
