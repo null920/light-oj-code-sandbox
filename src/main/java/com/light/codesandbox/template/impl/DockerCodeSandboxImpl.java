@@ -10,6 +10,7 @@ import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.command.ExecStartResultCallback;
 import com.light.codesandbox.model.ExecuteMessage;
 import com.light.codesandbox.template.JavaCodeSandboxTemplate;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
@@ -255,7 +256,8 @@ public class DockerCodeSandboxImpl extends JavaCodeSandboxTemplate {
                 throw new RuntimeException(e);
             }
         }
-        executeMessage.setMessage(message[0]);
+        // 去除换行符
+        executeMessage.setMessage(message[0].replaceAll("\n", ""));
         executeMessage.setErrorMessage(errorMessage[0]);
         executeMessage.setTime(time);
         executeMessage.setMemory(maxMemory[0]);
